@@ -17,7 +17,7 @@ COPY ./poetry.lock /usr/src/poetry/poetry.lock
 COPY ./pyproject.toml /usr/src/poetry/pyproject.toml
 
 # Copy pytest config file
-COPY ./pytest.ini /usr/src/config/pytest.ini
+COPY ./pytest.ini /usr/src/fastapi/pytest.ini
 
 # Configure Poetry to avoid creating a virtual environment
 RUN poetry config virtualenvs.create false
@@ -32,5 +32,6 @@ RUN poetry install --no-root --only main
 # Selecting a working directory
 WORKDIR /usr/src/fastapi
 
-# Copy the source code
-COPY ./src .
+COPY . .
+
+ENV PYTHONPATH=/usr/src/fastapi:/usr/src/fastapi/src

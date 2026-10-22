@@ -4,10 +4,18 @@ services:
       context: .
       dockerfile: ./docker/tests/Dockerfile
     container_name: backend_theater_test
-    command: [ "pytest", "-c", "/usr/src/config/pytest.ini",
-               "-m", "e2e", "--maxfail=5", "--disable-warnings", "-v", "--tb=short"]
+    command:
+      [
+        "pytest",
+        "-c", "/usr/src/fastapi/pytest.ini",
+        "-m", "e2e",
+        "--maxfail=5",
+        "--disable-warnings",
+        "-v",
+        "--tb=short"
+      ]
     environment:
-      - PYTHONPATH=/usr/src/fastapi
+      - PYTHONPATH=/usr/src/fastapi:/usr/src/fastapi/src
       - ENVIRONMENT=testing
       - EMAIL_HOST=mailhog_theater_test
       - EMAIL_PORT=1025
@@ -26,7 +34,7 @@ services:
       minio:
         condition: service_started
     volumes:
-      - ./src:/usr/src/fastapi
+      - ./:/usr/src/fastapi
     networks:
       - theater_network_test
 
