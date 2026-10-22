@@ -17,4 +17,3 @@ from src.schemas.accounts import (
     TokenRefreshRequestSchema,
     TokenRefreshResponseSchema
 )
-
