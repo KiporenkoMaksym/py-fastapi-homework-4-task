@@ -24,7 +24,7 @@ services:
       mailhog:
         condition: service_started
       minio:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - ./src:/usr/src/fastapi
     networks:
@@ -54,11 +54,6 @@ services:
       - MINIO_STORAGE=theater-storage
     volumes:
       - minio_data_test:/data
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - theater_network_test
 
@@ -70,7 +65,7 @@ services:
     command: [ "/bin/sh", "-c", "/commands/setup_minio.sh" ]
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_started
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=some_password

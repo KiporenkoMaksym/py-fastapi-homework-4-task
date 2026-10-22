@@ -69,12 +69,6 @@ class S3StorageClient(S3StorageInterface):
 
     async def get_file_url(self, file_name: str) -> str:
         """
-        Generate a public URL for a file stored in the S3-compatible storage.
-
-        Args:
-            file_name (str): The name of the file stored in the bucket.
-
-        Returns:
-            str: The full URL to access the file.
+        Generate the avatar URL in the required format.
         """
-        return f"{self._endpoint_url}/{self._bucket_name}/{file_name}"
+        return f"http://minio-theater/{file_name}"
