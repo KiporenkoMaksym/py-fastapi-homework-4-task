@@ -1,11 +1,12 @@
+import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-from config import get_settings
-from database import Base
+from src.config import get_settings
+from src.database.models.base import Base
 
 settings = get_settings()
 
@@ -18,29 +19,37 @@ AsyncSQLiteSessionLocal = sessionmaker(  # type: ignore
 )
 
 
+_tables_initialized = False
+_initialization_lock = asyncio.Lock()
+
+
+async def initialize_sqlite_database() -> None:
+    global _tables_initialized
+
+    if _tables_initialized:
+        return
+
+    async with _initialization_lock:
+        if _tables_initialized:
+            return
+
+        async with sqlite_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+        _tables_initialized = True
+
+
 async def get_sqlite_db() -> AsyncGenerator[AsyncSession, None]:
-    """
-    Provide an asynchronous database session.
+    await initialize_sqlite_database()
 
-    This function returns an async generator yielding a new database session.
-    It ensures that the session is properly closed after use.
-
-    :return: An asynchronous generator yielding an AsyncSession instance.
-    """
     async with AsyncSQLiteSessionLocal() as session:
         yield session
 
 
 @asynccontextmanager
 async def get_sqlite_db_contextmanager() -> AsyncGenerator[AsyncSession, None]:
-    """
-    Provide an asynchronous database session using a context manager.
+    await initialize_sqlite_database()
 
-    This function allows for managing the database session within a `with` statement.
-    It ensures that the session is properly initialized and closed after execution.
-
-    :return: An asynchronous generator yielding an AsyncSession instance.
-    """
     async with AsyncSQLiteSessionLocal() as session:
         yield session
 

@@ -38,7 +38,9 @@ RUN poetry install --no-root --only main
 WORKDIR /usr/src/fastapi
 
 # Copy the source code
-COPY ./src .
+COPY . .
+
+ENV PYTHONPATH=/usr/src/fastapi
 
 # Copy commands
 COPY ./commands /commands

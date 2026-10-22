@@ -8,8 +8,8 @@ from botocore.exceptions import (
     ConnectionError
 )
 
-from exceptions import S3ConnectionError, S3FileUploadError
-from storages import S3StorageInterface
+from src.exceptions import S3ConnectionError, S3FileUploadError
+from src.storages import S3StorageInterface
 
 
 class S3StorageClient(S3StorageInterface):
@@ -60,7 +60,7 @@ class S3StorageClient(S3StorageInterface):
                     Bucket=self._bucket_name,
                     Key=file_name,
                     Body=file_data,
-                    ContentType="image/jpeg"
+                    ContentType="image/png" if file_name.lower().endswith(".png") else "image/jpeg"
                 )
         except (ConnectionError, HTTPClientError, NoCredentialsError) as e:
             raise S3ConnectionError(f"Failed to connect to S3 storage: {str(e)}") from e
