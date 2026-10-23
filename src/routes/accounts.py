@@ -7,7 +7,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from config import settings
 from src.config import get_jwt_auth_manager, get_settings, BaseAppSettings, get_accounts_email_notificator
 from src.database import (
     get_db,
@@ -131,7 +130,7 @@ async def register_user(
         ) from e
     else:
         activation_link = (
-            f"{settings.BASE_URL}/api/v1/accounts/activate/"
+            f"{get_settings().BASE_URL}/api/v1/accounts/activate/"
             f"?email={new_user.email}&token={activation_token.token}"
         )
         background_tasks.add_task(
@@ -232,7 +231,7 @@ async def activate_account(
     await db.delete(token_record)
     await db.commit()
 
-    login_link = f"{settings.BASE_URL}/api/v1/accounts/login/"
+    login_link = f"{get_settings().BASE_URL}/api/v1/accounts/login/"
     background_tasks.add_task(
         email_sender.send_activation_complete_email,
         str(user.email),
@@ -286,7 +285,7 @@ async def request_password_reset_token(
     await db.commit()
 
     reset_link = (
-        f"{settings.BASE_URL}/api/v1/accounts/password-reset/complete/"
+        f"{get_settings().BASE_URL}/api/v1/accounts/password-reset/complete/"
         f"?email={user.email}&token={reset_token.token}"
     )
     background_tasks.add_task(
@@ -409,7 +408,7 @@ async def reset_password(
             detail="An error occurred while resetting the password."
         )
 
-    login_link = f"{settings.BASE_URL}/api/v1/accounts/login/"
+    login_link = f"{get_settings().BASE_URL}/api/v1/accounts/login/"
     background_tasks.add_task(
         email_sender.send_password_reset_complete_email,
         str(user.email),
