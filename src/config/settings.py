@@ -52,6 +52,7 @@ class Settings(BaseAppSettings):
     POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "test_host")
     POSTGRES_DB_PORT: int = int(os.getenv("POSTGRES_DB_PORT", 5432))
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "test_db")
+    BASE_URL: str = "http://127.0.0.1:8000"
 
     SECRET_KEY_ACCESS: str = os.getenv(
         "SECRET_KEY_ACCESS",
