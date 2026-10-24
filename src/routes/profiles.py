@@ -31,6 +31,7 @@ from src.storages.interfaces import S3StorageInterface
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+
 @router.post(
     "/users/{user_id}/profile/",
     response_model=ProfileResponseSchema,
