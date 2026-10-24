@@ -29,7 +29,7 @@ from src.security.interfaces import JWTAuthManagerInterface
 from src.storages.interfaces import S3StorageInterface
 
 router = APIRouter()
-
+logger = logging.getLogger(__name__)
 
 @router.post(
     "/users/{user_id}/profile/",
