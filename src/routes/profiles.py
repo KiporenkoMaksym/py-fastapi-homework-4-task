@@ -1,13 +1,14 @@
 from typing import Annotated
 from io import BytesIO
 from PIL import Image
+import logging
+
 
 from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
     status,
-    logger,
 )
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
