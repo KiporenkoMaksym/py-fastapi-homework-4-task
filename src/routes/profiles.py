@@ -1,15 +1,13 @@
-from datetime import date
-from pathlib import Path
 from typing import Annotated
+from io import BytesIO
+from PIL import Image
 
 from fastapi import (
     APIRouter,
     Depends,
-    File,
-    Form,
     HTTPException,
-    UploadFile,
     status,
+    logger,
 )
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -20,7 +18,11 @@ from src.config import get_jwt_auth_manager, get_s3_storage_client
 from src.database import get_db, UserModel, UserProfileModel, UserGroupEnum
 from src.database.models.accounts import GenderEnum
 from src.exceptions import InvalidTokenError, TokenExpiredError
-from src.schemas.profiles import ProfileCreateSchema, ProfileResponseSchema, get_profile_create_schema
+from src.schemas.profiles import (
+    ProfileCreateSchema,
+    ProfileResponseSchema,
+    get_profile_create_schema
+)
 from src.security.http import get_token
 from src.security.interfaces import JWTAuthManagerInterface
 from src.storages.interfaces import S3StorageInterface
@@ -104,8 +106,6 @@ async def create_user_profile(
 
     avatar = profile_data.avatar
     contents = await avatar.read()
-    from io import BytesIO
-    from PIL import Image
 
     image_format = Image.open(BytesIO(contents)).format
     suffix = ".png" if image_format == "PNG" else ".jpg"
@@ -115,7 +115,9 @@ async def create_user_profile(
         await s3_client.upload_file(avatar_key, contents)
         avatar_url = await s3_client.get_file_url(avatar_key)
     except Exception as error:
-        print(f"Avatar upload error: {type(error).__name__}: {error}")
+        logger.exception(
+            f"Avatar upload error: {type(error).__name__}: {error}"
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload avatar. Please try again later.",
@@ -135,7 +137,9 @@ async def create_user_profile(
         await db.commit()
         await db.refresh(profile)
     except SQLAlchemyError as error:
-        print(f"Profile database error: {type(error).__name__}: {error}")
+        logger.exception(
+            f"Profile database error: {type(error).__name__}: {error}"
+        )
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
